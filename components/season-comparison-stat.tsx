@@ -7,7 +7,7 @@ import type { Season } from "@/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import LoadingSpinner from "./loading-spinner"
 
-export default function SeasonComparison() {
+export default function SeasonComparisonStat() {
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [metric, setMetric] = useState<string>("demographics")
@@ -59,8 +59,8 @@ export default function SeasonComparison() {
     }
   }
 
-  const handleMetricChange = (value: string) => {
-    setMetric(value)
+  const handleSeasonChange = (value: string) => {
+    setSeason(value)
   }
 
   if (loading) {

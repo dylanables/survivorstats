@@ -4,10 +4,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DashboardStats from "@/components/dashboard-stats"
 import DemographicsChart from "@/components/demographics-chart"
 import WinnersTimeline from "@/components/winners-timeline"
-import SeasonComparison from "@/components/season-comparison"
+import SeasonComparisonChart from "@/components/season-comparison-chart"
 import LoadingSpinner from "@/components/loading-spinner"
+import SeasonProfile from "@/components/season-profile"
+import DemographicsSection from "@/components/demographics-section"
+import SeasonPage from "./seasons/[id]/page"
+import { fetchContestants, fetchSeasons } from "@/lib/data"
+import { notFound } from "next/navigation"
+import PerfectGameWinners from "@/components/perfect-game-winners"
 
-export default function Home() {
+export default async function Home() {
+
+  const current_season = "43"
+
+  const seasons = await fetchSeasons()
+  const season = seasons.find((s) => s.num_season === current_season)
+
+  if (!season) {
+    notFound()
+  }
+
+  const contestants = await fetchContestants()
+  const seasonContestants = contestants.filter((c) => c.num_season === current_season)
+
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col space-y-2">
@@ -19,6 +39,7 @@ export default function Home() {
         <TabsList className="bg-survivor-beige">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="demographics">Demographics</TabsTrigger>
+          <TabsTrigger value="current_season">Current Season</TabsTrigger>
           <TabsTrigger value="winners">Winners</TabsTrigger>
           <TabsTrigger value="seasons">Seasons</TabsTrigger>
         </TabsList>
@@ -48,7 +69,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Suspense fallback={<LoadingSpinner />}>
-                  <SeasonComparison />
+                  <SeasonComparisonChart />
                 </Suspense>
               </CardContent>
             </Card>
@@ -56,31 +77,21 @@ export default function Home() {
         </TabsContent>
 
         <TabsContent value="demographics" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <DemographicsSection />
+        </TabsContent>
+
+        <TabsContent value="current_season" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Gender Distribution</CardTitle>
+                <CardTitle>Current Season</CardTitle>
                 <CardDescription>Gender breakdown of contestants</CardDescription>
               </CardHeader>
               <CardContent>
                 <Suspense fallback={<LoadingSpinner />}>
-                  <DemographicsChart type="gender" />
+                  <SeasonProfile season={season} contestants={seasonContestants} />
                 </Suspense>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Ethnicity Distribution</CardTitle>
-                <CardDescription>Ethnic background of contestants</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <DemographicsChart type="ethnicity" />
-                </Suspense>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
 
         <TabsContent value="winners" className="space-y-4">
@@ -95,6 +106,17 @@ export default function Home() {
               </Suspense>
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Perfect Game Winners</CardTitle>
+              <CardDescription>Winners who did not have a vote against them</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Suspense fallback={<LoadingSpinner />}>
+                <PerfectGameWinners />
+              </Suspense>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="seasons" className="space-y-4">
@@ -105,7 +127,7 @@ export default function Home() {
             </CardHeader>
             <CardContent className="h-[500px]">
               <Suspense fallback={<LoadingSpinner />}>
-                <SeasonComparison />
+                <SeasonComparisonChart />
               </Suspense>
             </CardContent>
           </Card>
