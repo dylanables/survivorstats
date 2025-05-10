@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FlameKindlingIcon as Campfire, Users, Calendar, BarChart, Home } from "lucide-react"
+import { FlameKindlingIcon as Campfire, Users, Calendar, BarChart, Home, History } from "lucide-react"
+import MobileNav from "./mobile-nav"
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -21,6 +22,8 @@ export default function Navbar() {
               <span className="text-xl font-bold">Survivor Stats</span>
             </Link>
           </div>
+
+          <MobileNav />
 
           <div className="hidden md:block">
             <div className="flex items-center space-x-4">
@@ -58,6 +61,16 @@ export default function Navbar() {
                 <div className="flex items-center space-x-1">
                   <BarChart className="h-4 w-4" />
                   <span>Compare</span>
+                </div>
+              </Link>
+
+              <Link
+                href="/changelog"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive("/changelog")}`}
+              >
+                <div className="flex items-center space-x-1">
+                  <History className="h-4 w-4" />
+                  <span>Changelog</span>
                 </div>
               </Link>
             </div>

@@ -1,74 +1,61 @@
 import type { Contestant, Season, Tribe } from "./types"
+import { supabase } from "./supabase"
 
 export async function fetchContestants(): Promise<Contestant[]> {
-  const response = await fetch(
-    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/contestants-Cq2cgR0IDa0z4RHHEoM20MprGmmOle.csv",
-  )
-  const text = await response.text()
-  return parseCSV<Contestant>(text, processContestantData)
+  const { data, error } = await supabase.from("contestants").select("*")
+
+  if (error) {
+    console.error("Error fetching contestants:", error)
+    return []
+  }
+
+  // Process the data to ensure it matches your expected format
+  return data.map(processContestantData)
 }
 
 export async function fetchSeasons(): Promise<Season[]> {
-  const response = await fetch(
-    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/seasons-yxTWJJtVFO7k8UwI7BSahBdmfMofsI.csv",
-  )
-  const text = await response.text()
-  return parseCSV<Season>(text)
+  const { data, error } = await supabase.from("seasons").select("*")
+
+  if (error) {
+    console.error("Error fetching seasons:", error)
+    return []
+  }
+
+  return data
 }
 
 export async function fetchTribes(): Promise<Tribe[]> {
-  const response = await fetch(
-    "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/tribes-meEsotSPJbIz9yArK03qBpC7B0QUR0.csv",
-  )
-  const text = await response.text()
-  return parseCSV<Tribe>(text)
-}
+  const { data, error } = await supabase.from("tribes").select("*")
 
-function parseCSV<T>(csv: string, postProcess?: (entry: Record<string, any>) => Record<string, any>): T[] {
-  const lines = csv.split("\n")
-  const headers = lines[0].split(",")
+  if (error) {
+    console.error("Error fetching tribes:", error)
+    return []
+  }
 
-  return lines
-    .slice(1)
-    .filter((line) => line.trim() !== "")
-    .map((line) => {
-      const values = line.split(",")
-      const entry: Record<string, any> = {}
-
-      headers.forEach((header, index) => {
-        const value = values[index]?.trim()
-
-        if (value === undefined || value === "") {
-          entry[header] = null
-        } else if (!isNaN(Number(value))) {
-          entry[header] = Number(value)
-        } else {
-          entry[header] = value
-        }
-      })
-
-      // Apply post-processing if provided
-      if (postProcess) {
-        return postProcess(entry) as T
-      }
-
-      return entry as T
-    })
+  return data
 }
 
 // Process contestant data to fix hometown format
-function processContestantData(contestant: Record<string, any>): Record<string, any> {
-  // Handle hometown format "city, state"
-  if (contestant.hometown && typeof contestant.hometown === "string") {
-    const hometownParts = contestant.hometown.split(",").map((part: string) => part.trim())
-    contestant.city = hometownParts[0] || ""
-    contestant.homestate = hometownParts[1] || ""
-  } else {
-    contestant.city = ""
-    contestant.homestate = ""
+function processContestantData(contestant: Record<string, any>): Contestant {
+  try {
+    // Handle hometown format "city, state" if it exists in your Supabase data
+    if (contestant.hometown && typeof contestant.hometown === "string") {
+      const hometownParts = contestant.hometown.split(",").map((part: string) => part.trim())
+      contestant.city = hometownParts[0] || ""
+      contestant.homestate = hometownParts[1] || ""
+    } else {
+      // If city and homestate are already separate fields in your Supabase table
+      contestant.city = contestant.city || ""
+      contestant.homestate = contestant.homestate || ""
+    }
+  } catch (error) {
+    // Fallback for any parsing errors
+    contestant.city = contestant.city || ""
+    contestant.homestate = contestant.homestate || ""
+    console.error("Error processing contestant data:", error)
   }
 
-  return contestant
+  return contestant as Contestant
 }
 
 // Data analysis functions
