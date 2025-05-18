@@ -100,7 +100,7 @@ export default function USMapVisualization() {
     const intensity = Math.max(0.2, Math.min(0.9, count / maxCount))
 
     // Use the survivor-brown color with varying opacity
-    return `rgba(139, 69, 19, ${intensity})`
+    return `rgba(70,130,180,${intensity})`
   }
 
   if (loading) {
@@ -108,67 +108,59 @@ export default function USMapVisualization() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Contestant Distribution by State</CardTitle>
-        <CardDescription>Darker colors indicate more contestants from that state</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <TooltipProvider>
-          <div className="relative">
-            <svg
-              viewBox="0 0 960 600"
-              className="w-full h-auto"
-              aria-label="Map of United States showing Survivor contestant distribution"
-            >
-              {usStatesData.map((state) => {
-                const stateDataForState = stateData[state.abbreviation] || { count: 0, contestants: [] }
-                return (
-                  <Tooltip key={state.abbreviation}>
-                    <TooltipTrigger asChild>
-                      <path
-                        d={state.path}
-                        fill={getStateColor(state.abbreviation)}
-                        stroke="#ffffff"
-                        strokeWidth="1"
-                        aria-label={`${state.name}: ${stateDataForState.count || 0} contestants`}
-                        className="cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-survivor-brown"
-                        tabIndex={0}
-                        role="button"
-                        onClick={() => {
-                          // Keep tooltip open on click
-                          setTimeout(() => {
-                            const element = document.querySelector(`[data-state="${state.abbreviation}"]`)
-                            if (element instanceof HTMLElement) {
-                              element.focus()
-                            }
-                          }, 10)
-                        }}
-                        data-state={state.abbreviation}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-white p-3 shadow-lg rounded-md border border-survivor-beige">
-                      <div className="font-bold text-survivor-brown text-lg">{state.name}</div>
-                      <div className="text-md font-semibold">{stateDataForState.count || 0} contestants</div>
-                    </TooltipContent>
-                  </Tooltip>
-                )
-              })}
-            </svg>
+    <TooltipProvider>
+      <div className="relative">
+        <svg
+          viewBox="0 0 960 600"
+          className="w-full h-auto"
+          aria-label="Map of United States showing Survivor contestant distribution"
+        >
+          {usStatesData.map((state) => {
+            const stateDataForState = stateData[state.abbreviation] || { count: 0, contestants: [] }
+            return (
+              <Tooltip key={state.abbreviation}>
+                <TooltipTrigger asChild>
+                  <path
+                    d={state.path}
+                    fill={getStateColor(state.abbreviation)}
+                    stroke="#ffffff"
+                    strokeWidth="1"
+                    aria-label={`${state.name}: ${stateDataForState.count || 0} contestants`}
+                    className="cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-survivor-blue"
+                    tabIndex={0}
+                    role="button"
+                    onClick={() => {
+                      // Keep tooltip open on click
+                      setTimeout(() => {
+                        const element = document.querySelector(`[data-state="${state.abbreviation}"]`)
+                        if (element instanceof HTMLElement) {
+                          element.focus()
+                        }
+                      }, 10)
+                    }}
+                    data-state={state.abbreviation}
+                  />
+                </TooltipTrigger>
+                <TooltipContent className="bg-white p-3 shadow-lg rounded-md border border-survivor-beige">
+                  <div className="font-bold text-survivor-blue text-lg">{state.name}</div>
+                  <div className="text-md font-semibold">{stateDataForState.count || 0} contestants</div>
+                </TooltipContent>
+              </Tooltip>
+            )
+          })}
+        </svg>
 
-            {/* Legend */}
-            <div className="absolute bottom-2 right-2 bg-white bg-opacity-90 p-2 rounded-md border shadow-sm">
-              <div className="text-xs font-semibold mb-1">Contestants</div>
-              <div className="flex items-center space-x-1">
-                <div className="w-4 h-4 bg-[#f5f5f5] border"></div>
-                <span className="text-xs">0</span>
-                <div className="w-16 h-4 bg-gradient-to-r from-[rgba(139,69,19,0.2)] to-[rgba(139,69,19,0.9)]"></div>
-                <span className="text-xs">{maxCount}</span>
-              </div>
-            </div>
+        {/* Legend */}
+        <div className="absolute bottom-2 right-2 bg-white bg-opacity-90 p-2 rounded-md border shadow-sm">
+          <div className="text-xs font-semibold mb-1">Contestants</div>
+          <div className="flex items-center space-x-1">
+            <div className="w-4 h-4 bg-[#f5f5f5] border"></div>
+            <span className="text-xs">0</span>
+            <div className="w-16 h-4 bg-gradient-to-r from-[rgba(70,130,180,0.2)] to-[rgba(70,130,180,0.9)]"></div>
+            <span className="text-xs">{maxCount}</span>
           </div>
-        </TooltipProvider>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </TooltipProvider>
   )
 }

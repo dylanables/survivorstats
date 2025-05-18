@@ -19,13 +19,14 @@ interface TopWinner {
 }
 
 interface TopStatsListProps {
-  type: "profession" | "winner"
+  type: "profession" | "winner" | "winnerProfessions" | "multiFTC"
   count?: number
 }
 
 export default function TopStatsList({ type, count = 5 }: TopStatsListProps) {
   const [topProfessions, setTopProfessions] = useState<TopProfession[]>([])
   const [topWinners, setTopWinners] = useState<TopWinner[]>([])
+  const [topWinnerProfessions, setTopWinnerProfessions] = useState<TopProfession[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -90,6 +91,36 @@ export default function TopStatsList({ type, count = 5 }: TopStatsListProps) {
           setTopWinners(sortedWinners)
         }
 
+        // Process top professions of winners
+        if (type === "winnerProfessions") {
+          const professionCounts: Record<string, number> = {}
+
+          contestants.forEach((contestant) => {
+            if (contestant.finish === "1" && contestant.profession && contestant.profession.trim() !== "") {
+              // Normalize profession names (remove extra spaces, make lowercase)
+              const normalizedProfession = contestant.profession.trim().toLowerCase()
+
+              // Skip generic or empty professions
+              if (normalizedProfession === "n/a" || normalizedProfession === "unknown") {
+                return
+              }
+
+              professionCounts[normalizedProfession] = (professionCounts[normalizedProfession] || 0) + 1
+            }
+          })
+
+          // Sort and get top N professions
+          const sortedProfessions = Object.entries(professionCounts)
+            .map(([profession, count]) => ({
+              profession: profession.charAt(0).toUpperCase() + profession.slice(1), // Capitalize first letter
+              count,
+            }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, count)
+
+          setTopWinnerProfessions(sortedProfessions)
+        }
+
         setLoading(false)
       } catch (error) {
         console.error("Error loading data:", error)
@@ -107,42 +138,61 @@ export default function TopStatsList({ type, count = 5 }: TopStatsListProps) {
   // Render based on type
   if (type === "profession") {
     return (
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2">
-            <Briefcase className="h-5 w-5 text-survivor-brown" />
-            Top {count} Professions
-          </CardTitle>
-          <CardDescription>Most common contestant occupations</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {topProfessions.map((profession, index) => (
-              <div key={profession.profession} className="relative">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-survivor-beige text-survivor-brown font-bold">
-                      {index + 1}
-                    </div>
-                    <div>
-                      <p className="font-medium">{profession.profession}</p>
-                    </div>
-                  </div>
-                  <div className="font-semibold text-survivor-brown">{profession.count}</div>
+      <div className="space-y-4">
+        {topProfessions.map((profession, index) => (
+          <div key={profession.profession} className="relative">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-survivor-beige text-survivor-brown font-bold">
+                  {index + 1}
                 </div>
-                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
-                  <div
-                    className="h-full bg-survivor-brown"
-                    style={{
-                      width: `${(profession.count / topProfessions[0].count) * 100}%`,
-                    }}
-                  ></div>
+                <div>
+                  <p className="font-medium">{profession.profession}</p>
                 </div>
               </div>
-            ))}
+              <div className="font-semibold text-survivor-brown">{profession.count}</div>
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full bg-survivor-brown"
+                style={{
+                  width: `${(profession.count / topProfessions[0].count) * 100}%`,
+                }}
+              ></div>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        ))}
+      </div>
+    )
+  }
+
+  if (type === "winnerProfessions") {
+    return (
+      <div className="space-y-4">
+        {topWinnerProfessions.map((profession, index) => (
+          <div key={profession.profession} className="relative">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-survivor-beige text-survivor-brown font-bold">
+                  {index + 1}
+                </div>
+                <div>
+                  <p className="font-medium">{profession.profession}</p>
+                </div>
+              </div>
+              <div className="font-semibold text-survivor-brown">{profession.count}</div>
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full bg-survivor-brown"
+                style={{
+                  width: `${(profession.count / topWinnerProfessions[0].count) * 100}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+        ))}
+      </div>
     )
   }
 

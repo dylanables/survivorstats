@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart } from "recharts"
 import { fetchContestants, fetchSeasons } from "@/lib/data"
 import type { Contestant, Season } from "@/lib/types"
 import LoadingSpinner from "./loading-spinner"
@@ -16,6 +16,7 @@ export default function WinnersTimeline() {
         const [contestants, seasons] = await Promise.all([fetchContestants(), fetchSeasons()])
 
         const winnersData = processWinnersData(contestants, seasons)
+        console.log("winnersData", winnersData)
         setData(winnersData)
         setLoading(false)
       } catch (error) {
@@ -36,9 +37,6 @@ export default function WinnersTimeline() {
         seasonName: season.season,
         winner: season.winner,
         age: winner ? Number.parseInt(winner.age) : 0,
-        gender: winner ? (winner.gender === "M" ? "Male" : winner.gender === "F" ? "Female" : "Non-Binary") : "Unknown",
-        votesAgainst: winner ? Number.parseInt(winner.votes_against) : 0,
-        juryVotes: winner ? Number.parseInt(winner.num_jury_votes) : 0,
       }
     })
   }
@@ -51,7 +49,7 @@ export default function WinnersTimeline() {
     <div className="space-y-4">
       <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
+          <LineChart
             data={data}
             margin={{
               top: 20,
@@ -72,35 +70,8 @@ export default function WinnersTimeline() {
             />
             <Bar dataKey="age" fill="#8B4513" name="Age" />
             <Bar dataKey="juryVotes" fill="#2D5F3E" name="Jury Votes" />
-          </BarChart>
+          </LineChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead className="bg-survivor-green text-white">
-            <tr>
-              <th className="py-2 px-4 border">Season</th>
-              <th className="py-2 px-4 border">Winner</th>
-              <th className="py-2 px-4 border">Age</th>
-              <th className="py-2 px-4 border">Gender</th>
-              <th className="py-2 px-4 border">Votes Against</th>
-              <th className="py-2 px-4 border">Jury Votes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                <td className="py-2 px-4 border">{item.seasonName}</td>
-                <td className="py-2 px-4 border font-medium">{item.winner}</td>
-                <td className="py-2 px-4 border">{item.age}</td>
-                <td className="py-2 px-4 border">{item.gender}</td>
-                <td className="py-2 px-4 border">{item.votesAgainst}</td>
-                <td className="py-2 px-4 border">{item.juryVotes}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   )

@@ -8,6 +8,7 @@ import AgeDistributionChart from "./age-bar-chart"
 import AgeBarChart from "./age-bar-chart"
 import TopStatsList from "./top-stats-list"
 import USMapVisualization from "./usa-map"
+import { Briefcase } from "lucide-react"
 
 export default function DemographicsSection() {
   return (
@@ -51,8 +52,11 @@ export default function DemographicsSection() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Most Common Professions</CardTitle>
-              <CardDescription>Top 5 most common professions among all contestants</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-survivor-brown" />
+                Top 10 Professions
+              </CardTitle>
+              <CardDescription>Most common contestant occupations</CardDescription>
             </CardHeader>
             <CardContent>
               <Suspense fallback={<LoadingSpinner />}>
@@ -63,8 +67,8 @@ export default function DemographicsSection() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Home States</CardTitle>
-              <CardDescription>Where the contestants are from</CardDescription>
+              <CardTitle>Contestant Distribution by State</CardTitle>
+              <CardDescription>Darker colors indicate more contestants from that state</CardDescription>
             </CardHeader>
             <CardContent>
               <Suspense fallback={<LoadingSpinner />}>

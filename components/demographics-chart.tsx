@@ -17,8 +17,8 @@ export default function DemographicsChart({ type }: DemographicsChartProps) {
   const [season, setSeason] = useState<string>("all")
 
   const COLORS = {
-    gender: ["#2D5F3E", "#D2691E", "#4682B4"],
-    ethnicity: ["#8B4513", "#F0E68C", "#A52A2A", "#6A5ACD", "#4682B4"],
+    gender: ["#D2691E", "#2D5F3E", "#4682B4"],
+    ethnicity: ["#D2691E", "#2D5F3E", "#4682B4", "#A52A2A", "#6A5ACD", "#8B4513"],
   }
 
   useEffect(() => {

@@ -13,6 +13,9 @@ import { fetchContestants, fetchSeasons } from "@/lib/data"
 import { notFound } from "next/navigation"
 import PerfectGameWinners from "@/components/perfect-game-winners"
 import ContestantScatter from "@/components/contestant-scatter"
+import WinnersTable from "@/components/winners-table"
+import WinnersBoxPlot from "@/components/winners-boxplot"
+import TopStatsList from "@/components/top-stats-list"
 
 export default async function Home() {
 
@@ -109,28 +112,90 @@ export default async function Home() {
         </TabsContent>
 
         <TabsContent value="winners" className="space-y-4">
-          <Card>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="col-span-1">
+              <CardHeader>
+                <CardTitle>Top 3 Professions</CardTitle>
+                <CardDescription>Most common occupations among winners</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <TopStatsList type="winnerProfessions" count={3}/>
+                </Suspense>
+              </CardContent>
+            </Card>
+            <Card className="col-span-1">
+              <CardHeader>
+                <CardTitle>Top 3 Professions</CardTitle>
+                <CardDescription>Most common occupations among winners</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <TopStatsList type="winnerProfessions" count={3}/>
+                </Suspense>
+              </CardContent>
+            </Card>
+            <Card className="col-span-1">
+              <CardHeader>
+                <CardTitle>Top 3 Professions</CardTitle>
+                <CardDescription>Most common occupations among winners</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <TopStatsList type="winnerProfessions" count={3}/>
+                </Suspense>
+              </CardContent>
+            </Card>
+          </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card className="col-span-1">
             <CardHeader>
-              <CardTitle>Winners Timeline</CardTitle>
-              <CardDescription>Timeline of Survivor winners across all seasons</CardDescription>
+              <CardTitle>Gender of Winners</CardTitle>
+              <CardDescription>Composition of genders among winners</CardDescription>
             </CardHeader>
             <CardContent>
               <Suspense fallback={<LoadingSpinner />}>
-                <WinnersTimeline />
+                <DemographicsChart type="gender"/>
               </Suspense>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="col-span-1">
             <CardHeader>
-              <CardTitle>Perfect Game Winners</CardTitle>
-              <CardDescription>Winners who did not have a vote against them</CardDescription>
+              <CardTitle>Gender of Winners</CardTitle>
+              <CardDescription>Composition of genders among winners</CardDescription>
             </CardHeader>
             <CardContent>
               <Suspense fallback={<LoadingSpinner />}>
-                <PerfectGameWinners />
+                <DemographicsChart type="ethnicity"/>
               </Suspense>
             </CardContent>
           </Card>
+          <Card className="col-span-1">
+            <CardHeader>
+              <CardTitle>Age of Winners</CardTitle>
+              <CardDescription>Box plot of ages of winners</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Suspense fallback={<LoadingSpinner />}>
+                <WinnersBoxPlot />
+              </Suspense>
+            </CardContent>
+          </Card>
+        </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>All Winners</CardTitle>
+              <CardDescription>Infomation about each season's winner</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Suspense fallback={<LoadingSpinner />}>
+                <WinnersTable />
+              </Suspense>
+            </CardContent>
+          </Card>
+          
         </TabsContent>
       </Tabs>
     </div>

@@ -168,7 +168,7 @@ export default function AgeBarChart() {
             />
             <Bar
               dataKey="count"
-              fill="#8B4513"
+              fill="#D2691E"
               name="Contestants"
               // Add a gradient fill for visual appeal
               background={{ fill: "#eee" }}
