@@ -1,22 +1,52 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, Label } from "recharts"
 import { fetchSeasons } from "@/lib/data"
 import type { Season } from "@/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import LoadingSpinner from "./loading-spinner"
+
+const testData = [
+  {
+    season: "S1",
+    africanAmerican: 2,
+    asianAmerican: 1,
+    latinAmerican: 0,
+    totalPOC: 3,
+    lgbt: 1,
+  },
+  {
+    season: "S2",
+    africanAmerican: 3,
+    asianAmerican: 2,
+    latinAmerican: 1,
+    totalPOC: 6,
+    lgbt: 2,
+  },
+  {
+    season: "S3",
+    africanAmerican: 1,
+    asianAmerican: 3,
+    latinAmerican: 2,
+    totalPOC: 6,
+    lgbt: 3,
+  },
+]
 
 export default function SeasonComparisonChart() {
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [metric, setMetric] = useState<string>("demographics")
 
+  console.log("Metric:", metric)
+
   useEffect(() => {
     async function loadData() {
       try {
         const seasons = await fetchSeasons()
         const processedData = processSeasonData(seasons, metric)
+        console.log("Processed Data:", processedData)
         setData(processedData)
         setLoading(false)
       } catch (error) {
@@ -32,11 +62,9 @@ export default function SeasonComparisonChart() {
     if (metricType === "demographics") {
       return seasons.map((season) => ({
         season: `S${season.num_season}`,
-        "African American": season.african_american,
-        "Asian American": season.asian_american,
-        "Latin American": season.latin_american,
-        "Total POC": Number.parseInt(season.poc as string),
-        LGBT: season.lgbt,
+        africanAmerican: season.african_american,
+        asianAmerican: season.asian_american,
+        latinAmerican: season.latin_american,
       }))
     } else if (metricType === "structure") {
       return seasons.map((season) => ({
@@ -76,15 +104,16 @@ export default function SeasonComparisonChart() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="demographics">Demographics</SelectItem>
-            <SelectItem value="structure">Season Structure</SelectItem>
-            <SelectItem value="twists">Twists & Events</SelectItem>
+            <SelectItem value="underRadar">Under the Radar Players</SelectItem>
+            <SelectItem value="merge">Merges</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
+          {metric === "demographics" ? (
+            <BarChart
             data={data}
             margin={{
               top: 20,
@@ -94,38 +123,30 @@ export default function SeasonComparisonChart() {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="season" angle={-45} textAnchor="end" height={60} interval={0} />
-            <YAxis />
+            <XAxis dataKey="season" angle={-45} textAnchor="end" height={60} interval={0}>
+              <Label value="Seasons" position="insideBottom" />
+            </XAxis>
+            <YAxis>
+              <Label value="# of Contestants" angle={270} position='insideLeft' style={{ textAnchor: 'middle' }} />
+            </YAxis>
             <Tooltip />
             <Legend />
-            {metric === "demographics" && (
-              <>
-                <Bar dataKey="African American" fill="#8B4513" />
-                <Bar dataKey="Asian American" fill="#F0E68C" />
-                <Bar dataKey="Latin American" fill="#A52A2A" />
-                <Bar dataKey="Total POC" fill="#6A5ACD" />
-                <Bar dataKey="LGBT" fill="#4682B4" />
-              </>
-            )}
-            {metric === "structure" && (
-              <>
-                <Bar dataKey="Contestants" fill="#2D5F3E" />
-                <Bar dataKey="Merge" fill="#D2691E" />
-                <Bar dataKey="Jury" fill="#F0E68C" />
-                <Bar dataKey="FTC" fill="#A52A2A" />
-                <Bar dataKey="Days" fill="#4682B4" />
-              </>
-            )}
-            {metric === "twists" && (
-              <>
-                <Bar dataKey="Quits" fill="#A52A2A" />
-                <Bar dataKey="Evacuations" fill="#D2691E" />
-                <Bar dataKey="Swaps" fill="#F0E68C" />
-                <Bar dataKey="Redemption Island" fill="#2D5F3E" />
-                <Bar dataKey="Edge of Extinction" fill="#6A5ACD" />
-              </>
-            )}
+            <Bar dataKey="africanAmerican" name="African American" fill="#D72638" stackId="race" />
+            <Bar dataKey="asianAmerican" name="Asian American" fill="#3F88C5" stackId="race" />
+            <Bar dataKey="latinAmerican" name="Latin American" fill="#F49D37" stackId="race" />
           </BarChart>
+          ) : (metric === "underRadar") ? (
+            <ScatterChart>
+              <XAxis dataKey="votes_against" />
+              <YAxis dataKey="normalized_finish" domain={[0, 1]} />
+              <Tooltip />
+              <Scatter data={data} fill="#82ca9d" />
+            </ScatterChart>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-500">No data available for this metric.</p>
+            </div>
+          )}
         </ResponsiveContainer>
       </div>
     </div>

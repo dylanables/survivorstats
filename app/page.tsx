@@ -12,6 +12,7 @@ import SeasonPage from "./seasons/[id]/page"
 import { fetchContestants, fetchSeasons } from "@/lib/data"
 import { notFound } from "next/navigation"
 import PerfectGameWinners from "@/components/perfect-game-winners"
+import ContestantScatter from "@/components/contestant-scatter"
 
 export default async function Home() {
 
@@ -41,7 +42,6 @@ export default async function Home() {
           <TabsTrigger value="demographics">Demographics</TabsTrigger>
           <TabsTrigger value="current_season">Current Season</TabsTrigger>
           <TabsTrigger value="winners">Winners</TabsTrigger>
-          <TabsTrigger value="seasons">Seasons</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -62,6 +62,20 @@ export default async function Home() {
               </CardContent>
             </Card>
 
+            <Card className="col-span-2">
+              <CardHeader>
+                <CardTitle>Play Style</CardTitle>
+                <CardDescription>Plot of votes cast against each contestant and their normalized finish. Indicates whether the contestant played under the radar or choatic.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <ContestantScatter type="votesAgainstNormalizedFinish" />
+                </Suspense>
+              </CardContent>
+            </Card>
+          </div>
+
+            <div>
             <Card className="col-span-2">
               <CardHeader>
                 <CardTitle>Season Comparison</CardTitle>
@@ -114,20 +128,6 @@ export default async function Home() {
             <CardContent>
               <Suspense fallback={<LoadingSpinner />}>
                 <PerfectGameWinners />
-              </Suspense>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="seasons" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Season Comparison</CardTitle>
-              <CardDescription>Compare key metrics across different seasons</CardDescription>
-            </CardHeader>
-            <CardContent className="h-[500px]">
-              <Suspense fallback={<LoadingSpinner />}>
-                <SeasonComparisonChart />
               </Suspense>
             </CardContent>
           </Card>

@@ -1,8 +1,10 @@
 import type { Contestant, Season, Tribe } from "./types"
 import { supabase } from "./supabase"
 
-export async function fetchContestants(): Promise<Contestant[]> {
-  const { data, error } = await supabase.from("contestants").select("*")
+export async function fetchContestants(season?: number | null): Promise<Contestant[]> {
+  let query = supabase.from("contestants").select("*")
+  if (season && season > 0) { query = query.eq("num_season", season) }
+  const { data, error } = await query
 
   if (error) {
     console.error("Error fetching contestants:", error)

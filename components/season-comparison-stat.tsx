@@ -98,33 +98,15 @@ export default function SeasonComparisonStat() {
             <YAxis />
             <Tooltip />
             <Legend />
-            {metric === "demographics" && (
-              <>
+
+
                 <Bar dataKey="African American" fill="#8B4513" />
                 <Bar dataKey="Asian American" fill="#F0E68C" />
                 <Bar dataKey="Latin American" fill="#A52A2A" />
                 <Bar dataKey="Total POC" fill="#6A5ACD" />
                 <Bar dataKey="LGBT" fill="#4682B4" />
-              </>
-            )}
-            {metric === "structure" && (
-              <>
-                <Bar dataKey="Contestants" fill="#2D5F3E" />
-                <Bar dataKey="Merge" fill="#D2691E" />
-                <Bar dataKey="Jury" fill="#F0E68C" />
-                <Bar dataKey="FTC" fill="#A52A2A" />
-                <Bar dataKey="Days" fill="#4682B4" />
-              </>
-            )}
-            {metric === "twists" && (
-              <>
-                <Bar dataKey="Quits" fill="#A52A2A" />
-                <Bar dataKey="Evacuations" fill="#D2691E" />
-                <Bar dataKey="Swaps" fill="#F0E68C" />
-                <Bar dataKey="Redemption Island" fill="#2D5F3E" />
-                <Bar dataKey="Edge of Extinction" fill="#6A5ACD" />
-              </>
-            )}
+              
+            
           </BarChart>
         </ResponsiveContainer>
       </div>

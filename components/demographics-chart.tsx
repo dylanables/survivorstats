@@ -5,14 +5,16 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { fetchContestants } from "@/lib/data"
 import type { Contestant } from "@/lib/types"
 import LoadingSpinner from "./loading-spinner"
+import SeasonFilter from "./season-filter"
 
 interface DemographicsChartProps {
-  type: "gender" | "ethnicity"
+  type: "gender" | "ethnicity",
 }
 
 export default function DemographicsChart({ type }: DemographicsChartProps) {
   const [data, setData] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [season, setSeason] = useState<string>("all")
 
   const COLORS = {
     gender: ["#2D5F3E", "#D2691E", "#4682B4"],
@@ -23,12 +25,14 @@ export default function DemographicsChart({ type }: DemographicsChartProps) {
     async function loadData() {
       try {
         const contestants = await fetchContestants()
+        const filteredContestants =
+          season === "all" ? contestants : contestants.filter((c) => c.num_season === season)
 
         if (type === "gender") {
-          const genderData = processGenderData(contestants)
+          const genderData = processGenderData(filteredContestants)
           setData(genderData)
         } else {
-          const ethnicityData = processEthnicityData(contestants)
+          const ethnicityData = processEthnicityData(filteredContestants)
           setData(ethnicityData)
         }
 
@@ -40,7 +44,7 @@ export default function DemographicsChart({ type }: DemographicsChartProps) {
     }
 
     loadData()
-  }, [type])
+  }, [type, season])
 
   const processGenderData = (contestants: Contestant[]) => {
     const genderCount = {
@@ -85,6 +89,8 @@ export default function DemographicsChart({ type }: DemographicsChartProps) {
   }
 
   return (
+    <>
+    <SeasonFilter setSeason={setSeason} />
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
@@ -105,5 +111,6 @@ export default function DemographicsChart({ type }: DemographicsChartProps) {
         <Legend />
       </PieChart>
     </ResponsiveContainer>
+    </>
   )
 }

@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { fetchContestants, fetchSeasons, fetchTribes } from "@/lib/data"
-import { Users, Calendar, Flag, Award } from "lucide-react"
+import { Users, Calendar, Flag, Award, User } from "lucide-react"
+import Link from "next/link"
 
 export default function DashboardStats() {
   const [stats, setStats] = useState({
     totalContestants: 0,
     totalSeasons: 0,
-    totalTribes: 0,
+    mostDays: { days: 0, name: "" },
     averageAge: 0,
   })
   const [loading, setLoading] = useState(true)
@@ -29,7 +30,7 @@ export default function DashboardStats() {
         setStats({
           totalContestants: uniqueContestants.size,
           totalSeasons: seasons.length,
-          totalTribes: new Set(tribes.map((t) => t.tribe)).size,
+          mostDays: { days: 152, name: "Rob Mariano"},
           averageAge,
         })
         setLoading(false)
@@ -72,19 +73,24 @@ export default function DashboardStats() {
 
       <Card className="bg-white/90">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Tribes</CardTitle>
-          <Flag className="h-4 w-4 text-survivor-red" />
+          <CardTitle className="text-sm font-medium">Most Days Played</CardTitle>
+          <Award className="h-4 w-4 text-survivor-red" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.totalTribes}</div>
-          <p className="text-xs text-muted-foreground">Unique tribes across all seasons</p>
+          <div className="text-2xl font-bold">{stats.mostDays.days}</div>
+          <p className="text-xs text-muted-foreground">
+            <Link href={`/contestants/${stats.mostDays.name}`} className="hover:underline flex items-center gap-1">
+              <User className="h-3 w-3" />
+              {stats.mostDays.name}
+            </Link>
+          </p>
         </CardContent>
       </Card>
 
       <Card className="bg-white/90">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Average Age</CardTitle>
-          <Award className="h-4 w-4 text-survivor-orange" />
+          <Flag className="h-4 w-4 text-survivor-orange" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.averageAge}</div>
